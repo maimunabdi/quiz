@@ -1,0 +1,377 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Quiz App</title>
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;900&display=swap");
+
+*{
+    font-family: 'poppins',sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+list-style: none;
+text-decoration: none;
+scroll-padding-top: 2em;
+scroll-behavior: smooth;
+}
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .quiz-container {
+            text-align: center;
+            background-color: white;
+            padding: 20px;
+            margin-top: 90%;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        #question {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        button.choice {
+            background-color: #ef66f6;
+            color: rgb(249, 246, 246);
+            padding: 10px;
+            width: 100%;
+            border: none;
+            border-radius: 5px;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+
+        button.choice:hover {
+            background-color: #141514;
+        }
+
+        #result {
+            font-size: 1.2rem;
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #feedback {
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 5px;
+        }
+
+        #feedback.correct {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #feedback.incorrect {
+            background-color: #F44336;
+            color: white;
+        }
+
+        #timer {
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+        
+header{
+    position: fixed;
+    width: 100%;
+    top: 0;
+    right: 0;
+    z-index:1000;
+    display: flex;
+    align-items: center;
+    justify-content:space-between;
+    background: var(--bg-color);
+    box-shadow: 0  8px  11px  rgb(14 55 54/15%);
+    padding: 20px  100px;
+    transition: 0.5s;
+}
+.profile{
+    display: flex;
+    align-items: center;
+    column-gap: 0.5rem;
+    cursor: pointer;
+}
+.profile img{
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 50%;
+}
+.profile span{
+    font-size:13px ;
+    font-weight: 500;
+}
+.logo{
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--tex-color);
+    column-gap: 0.5rem;
+}
+.logo .bx  {
+    font-size: 24px;
+    color: #ff7e00;
+}
+
+.navbar{
+    display: flex;
+    column-gap: 0.5rem;
+}
+.navbar a{
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--tex-color);
+    padding: 0.5rem 1rem;
+}
+.navbar a:hover,
+.navbar .home-active{
+    background: #3cb815; 
+    border-radius: 5rem;
+    color:  var(--bg-color);
+    transition: background o.5s;
+}
+
+
+    </style>
+</head>
+<header>
+    <a href="#" class="logo"><i class='bx bx-question-mark'></i>quiz</a>
+
+   
+
+     <!-- nav -->
+      <ul class="navbar">
+        <li><a href="#home" class="home-active">home</a></li>
+        <li><a href="#semister1">semister1</a></li>
+        <li><a href="#semister2">semister2</a></li>
+        <li><a href="#semister3">semister3</a></li>
+        <li><a href="#customer">semister4</a></li>
+      </ul>
+      <!-- profile -->
+       <div class="profile">
+        <img src="./maymuun.jpg"  alt="">
+
+        <span> maimun abdi</span>
+     
+        <i class='bx bx-caret-down'></i>
+    
+       </div>
+</header>
+<body>
+    <div class="quiz-container">
+        <h1>Quiz App</h1>
+        <div id="quiz">
+            <div id="question"></div>
+            <div id="choices">
+                <button class="choice" onclick="checkAnswer(0)"></button>
+                <button class="choice" onclick="checkAnswer(1)"></button>
+                <button class="choice" onclick="checkAnswer(2)"></button>
+                <button class="choice" onclick="checkAnswer(3)"></button>
+            </div>
+            <div id="timer">
+                Time left: <span id="time-left">30</span> seconds
+            </div>
+        </div>
+        <div id="result" class="hidden">
+            <h2>Your Score: <span id="score"></span>/5</h2>
+            <div id="answer-summary">
+                <h3>Answer Summary:</h3>
+                <ul id="answer-list"></ul>
+            </div>
+            <button onclick="startQuiz()">Retry</button>
+        </div>
+        <div id="feedback" class="hidden">
+            <p id="feedback-text"></p>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "Who is the last prophet of Islam?",
+                choices: ["Ibrahim (AS)", "Musa (AS)", "Isa (AS)", "Muhammad (SAW)"],
+                correctAnswer: 3
+            },
+            {
+                question: "How many obligatory prayers are there each day?",
+                choices: ["3", "4", "5", "6"],
+                correctAnswer: 2
+            },
+            {
+                question: "Over how many years was the Quran revealed?",
+                choices: ["23 years", "25 years", "30 years", "35 years"],
+                correctAnswer: 0
+            },
+            {
+                question: "In which city was Prophet Muhammad (SAW) born?",
+                choices: ["Makkah", "Madinah", "Baqi", "Badr"],
+                correctAnswer: 0
+            },
+            {
+                question: "How many times does Ramadan occur in the Islamic year?",
+                choices: ["10 times", "12 times", "14 times", "15 times"],
+                correctAnswer: 1
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let timeLeft = 30;
+        let timerInterval;
+        let answers = [];
+
+        // Shuffle Questions
+        function shuffleQuestions() {
+            questions.sort(() => Math.random() - 0.5);
+        }
+
+        // Shuffle Choices
+        function shuffleChoices(choices) {
+            return choices.sort(() => Math.random() - 0.5);
+        }
+
+        // Start Quiz
+        function startQuiz() {
+            shuffleQuestions();
+            currentQuestionIndex = 0;
+            score = 0;
+            answers = []; // Clear previous answers
+            timeLeft = 30;
+            document.getElementById('result').classList.add('hidden');
+            document.getElementById('quiz').classList.remove('hidden');
+            loadQuestion();
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        // Update Timer
+        function updateTimer() {
+            timeLeft--;
+            document.getElementById('time-left').textContent = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                checkAnswer(null);
+            }
+        }
+
+        // Stop Timer
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        // Load Question
+        function loadQuestion() {
+            const questionData = questions[currentQuestionIndex];
+            document.getElementById('question').textContent = questionData.question;
+
+            const shuffledChoices = shuffleChoices([...questionData.choices]);
+            const choices = document.querySelectorAll('.choice');
+            shuffledChoices.forEach((choice, index) => {
+                choices[index].textContent = choice;
+            });
+
+            questionData.shuffledChoices = shuffledChoices;
+            document.getElementById('feedback').classList.add('hidden');
+        }
+
+        // Check Answer
+        function checkAnswer(selectedIndex) {
+            stopTimer();
+            const questionData = questions[currentQuestionIndex];
+            const selectedChoice = selectedIndex !== null ? questionData.shuffledChoices[selectedIndex] : null;
+            const correctAnswer = questionData.choices[questionData.correctAnswer];
+
+            const feedback = document.getElementById('feedback');
+            const feedbackText = document.getElementById('feedback-text');
+
+            if (selectedChoice === correctAnswer) {
+                score++;
+                feedback.classList.remove('incorrect');
+                feedback.classList.add('correct');
+                feedbackText.textContent = "Correct!";
+            } else {
+                feedback.classList.remove('correct');
+                feedback.classList.add('incorrect');
+                feedbackText.textContent = `Incorrect! The correct answer is: ${correctAnswer}`;
+            }
+
+            feedback.classList.remove('hidden');
+
+            // Record user answer
+            answers.push({
+                question: questionData.question,
+                userAnswer: selectedChoice,
+                correctAnswer: correctAnswer
+            });
+
+            // Disable choices
+            const choices = document.querySelectorAll('.choice');
+            choices.forEach(choice => {
+                choice.disabled = true;
+            });
+
+            // Wait and load next question
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < questions.length) {
+                    loadQuestion();
+                    timeLeft = 30;
+                    document.getElementById('time-left').textContent = timeLeft;
+                    timerInterval = setInterval(updateTimer, 1000);
+                } else {
+                    endQuiz();
+                }
+                choices.forEach(choice => {
+                    choice.disabled = false;
+                });
+            }, 1000);
+        }
+
+        // End Quiz and Show Results
+        function endQuiz() {
+            document.getElementById('quiz').classList.add('hidden');
+            document.getElementById('result').classList.remove('hidden');
+            document.getElementById('score').textContent = score;
+
+            // Display Answer Summary
+            const answerList = document.getElementById('answer-list');
+            answerList.innerHTML = ''; // Clear previous answers
+            answers.forEach(answer => {
+                const li = document.createElement('li');
+                li.textContent = `${answer.question} 
+                                  - Your Answer: ${answer.userAnswer} 
+                                  - Correct Answer: ${answer.correctAnswer}`;
+                answerList.appendChild(li);
+            });
+        }
+
+        // Initialize Quiz
+        startQuiz();
+    </script>
+    
+</body>
+</html>
